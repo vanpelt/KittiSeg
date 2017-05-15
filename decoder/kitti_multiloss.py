@@ -60,16 +60,18 @@ def loss(hypes, decoded_logits, labels):
     Returns:
       loss: Loss tensor of type float.
     """
+    num_classes = hypes['arch']['num_classes']
     logits = decoded_logits['logits']
     with tf.name_scope('loss'):
-        logits = tf.reshape(logits, (-1, 2))
-        shape = [logits.get_shape()[0], 2]
+        logits = tf.reshape(logits, (-1, num_classes))
+        shape = [logits.get_shape()[0], num_classes]
         epsilon = tf.constant(value=hypes['solver']['epsilon'])
         # logits = logits + epsilon
-        labels = tf.to_float(tf.reshape(labels, (-1, 2)))
+        labels = tf.to_float(tf.reshape(labels, (-1, num_classes)))
 
         softmax = tf.nn.softmax(logits) + epsilon
-
+        print("Softmax shape", softmax.get_shape())
+        print("Logit shape", logits.get_shape())
         if hypes['loss'] == 'xentropy':
             cross_entropy_mean = _compute_cross_entropy_mean(hypes, labels,
                                                              softmax)
@@ -97,6 +99,11 @@ def loss(hypes, decoded_logits, labels):
 
 def _compute_cross_entropy_mean(hypes, labels, softmax):
     head = hypes['arch']['weight']
+    num_classes = hypes['arch']['num_classes']
+
+    if head == []:
+        head = [1]*num_classes # no weighting
+
     cross_entropy = -tf.reduce_sum(tf.multiply(labels * tf.log(softmax), head),
                                    reduction_indices=[1])
 
@@ -130,7 +137,7 @@ def _compute_soft_ui(hypes, labels, softmax, epsilon):
     return mean_iou
 
 
-def evaluation(hyp, images, labels, decoded_logits, losses, global_step):
+def evaluation(hypes, images, labels, decoded_logits, losses, global_step):
     """Evaluate the quality of the logits at predicting the label.
 
     Args:
@@ -146,9 +153,12 @@ def evaluation(hyp, images, labels, decoded_logits, losses, global_step):
     # It returns a bool tensor with shape [batch_size] that is true for
     # the examples where the label's is was in the top k (here k=1)
     # of all logits for that example.
+
+    num_classes = hypes['arch']['num_classes']
+
     eval_list = []
-    logits = tf.reshape(decoded_logits['logits'], (-1, 2))
-    labels = tf.reshape(labels, (-1, 2))
+    logits = tf.reshape(decoded_logits['logits'], (-1, num_classes))
+    labels = tf.reshape(labels, (-1, num_classes))
 
     pred = tf.argmax(logits, dimension=1)
 

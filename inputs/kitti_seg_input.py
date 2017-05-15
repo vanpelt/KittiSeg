@@ -147,22 +147,24 @@ def _make_data_gen(hypes, phase, data_dir):
 
     data_file = os.path.join(data_dir, data_file)
 
-    road_color = np.array(hypes['data']['road_color'])
-    background_color = np.array(hypes['data']['background_color'])
+    # for color_name in hypes['data']['colors']:
+    #     road_color = np.array(hypes['data']['road_color'])
+    #     background_color = np.array(hypes['data']['background_color'])
 
     data = _load_gt_file(hypes, data_file)
 
     for image, gt_image in data:
+        gts = []
+        for color_name, color in hypes['data']['colors'].items():
+            gts.append(np.all(gt_image == color, axis = 2))
+#        gt_bg = np.all(gt_image == background_color, axis=2)
+#        gt_road = np.all(gt_image == road_color, axis=2)
 
-        gt_bg = np.all(gt_image == background_color, axis=2)
-        gt_road = np.all(gt_image == road_color, axis=2)
-
-        assert(gt_road.shape == gt_bg.shape)
-        shape = gt_bg.shape
-        gt_bg = gt_bg.reshape(shape[0], shape[1], 1)
-        gt_road = gt_road.reshape(shape[0], shape[1], 1)
-
-        gt_image = np.concatenate((gt_bg, gt_road), axis=2)
+#        assert(gt_road.shape == gt_bg.shape)
+        shape = gts[0].shape
+        reshape_gts = [gt.reshape(shape[0], shape[1], 1) for gt in gts]
+#        gt_road = gt_road.reshape(shape[0], shape[1], 1)
+        gt_image = np.concatenate(reshape_gts, axis=2)
 
         if phase == 'val':
             yield image, gt_image

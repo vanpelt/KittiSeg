@@ -119,7 +119,7 @@ def main(_):
     utils.set_dirs(hypes, tf.app.flags.FLAGS.hypes)
 
     utils._add_paths_to_sys(hypes)
-
+    print("Base Path %s" %hypes['dirs']['base_path'])
     train.maybe_download_and_extract(hypes)
     logging.info("Initialize training folder")
     train.initialize_training_folder(hypes)

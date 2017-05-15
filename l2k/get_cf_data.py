@@ -7,13 +7,13 @@ import urllib
 def download_data(cf_csv):
     df = pd.read_csv(cf_csv)
 
-    annotation = [json.loads(a) for a in df['annotation']]
-    gt_urls = [a['url'] for a in annotation] # so pythonic...
-    for i, url in enumerate(gt_urls):
-        urllib.urlretrieve (url, str(i)+"_gt.png")
+    # annotation = [json.loads(a) for a in df['annotation']]
+    # gt_urls = [a['url'] for a in annotation] # so pythonic...
+    # for i, url in enumerate(gt_urls):
+    #     urllib.urlretrieve (url, str(i)+"_gt.png")
 
-    image_url = [json.loads(a) for a in df['url']]
-    for i, url in enumerate(image_urls):
+    for i, url in enumerate(df['url']):
+        print("Downloading %s" % url)
         urllib.urlretrieve (url, str(i)+".png")
 
 @click.command()

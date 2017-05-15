@@ -23,13 +23,17 @@ def eval_image(hypes, gt_image, cnn_image):
     """."""
     thresh = np.array(range(0, 256))/255.0
 
-    road_color = np.array(hypes['data']['road_color'])
-    background_color = np.array(hypes['data']['background_color'])
-    gt_road = np.all(gt_image == road_color, axis=2)
-    gt_bg = np.all(gt_image == background_color, axis=2)
-    valid_gt = gt_road + gt_bg
+    #road_color = np.array(hypes['data']['road_color'])
+    #background_color = np.array(hypes['data']['background_color'])
+    gts = []
 
-    FN, FP, posNum, negNum = seg.evalExp(gt_road, cnn_image,
+    for color_name, color in hypes['data']['colors'].items():
+        gts.append(np.all(gt_image == color, axis = 2))
+
+    valid_gt = np.sum(gts)
+
+    # right now this only calculates for the first thing
+    FN, FP, posNum, negNum = seg.evalExp(gts[0], cnn_image,
                                          thresh, validMap=None,
                                          validArea=valid_gt)
 
@@ -67,6 +71,7 @@ def evaluate(hypes, sess, image_pl, inf_out):
 
         with open(data_file) as file:
             for i, datum in enumerate(file):
+                    print("Looking at %i" % i)
                     datum = datum.rstrip()
                     image_file, gt_file = datum.split(" ")
                     image_file = os.path.join(image_dir, image_file)

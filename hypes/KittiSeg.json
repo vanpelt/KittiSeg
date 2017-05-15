@@ -16,7 +16,7 @@
     "vgg_url": "ftp://mi.eng.cam.ac.uk/pub/mttt2/models/vgg16.npy",
     "kitti_url": ""
   },
- 
+
   "arch": {
     "fcn_in": "fc7",
     "num_classes" : 2,
@@ -47,10 +47,10 @@
   },
 
   "logging": {
-    "display_iter": 20,
+    "display_iter": 10,
     "eval_iter": 100,
     "write_iter": 100,
-    "save_iter": 2000,
+    "save_iter": 20,
     "image_iter": 20000
   },
 

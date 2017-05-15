@@ -35,7 +35,9 @@ def inference(hypes, images, train=True):
 
     vgg_fcn.wd = hypes['wd']
 
-    vgg_fcn.build(images, train=train, num_classes=2, random_init_fc8=True)
+    num_classes = hypes['arch']['num_classes']
+
+    vgg_fcn.build(images, train=train, num_classes=num_classes, random_init_fc8=True)
 
     logits = {}
 
